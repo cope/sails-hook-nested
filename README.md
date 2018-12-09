@@ -1,8 +1,6 @@
-<p align="center">
-  <a href="http://stojadinovic.net">
-    <img alt="Predrag Stojadinovic" src="https://en.stojadinovic.net/assets/images/logo-128x128-88.jpg" width="100">
-  </a>
-</p>
+<a href="http://stojadinovic.net">
+  <img alt="Predrag Stojadinovic" src="https://en.stojadinovic.net/assets/images/logo-128x128-88.jpg" width="100">
+</a>
 
 ## sails-hook-nested
 [![build status](https://img.shields.io/travis/cope/sails-hook-nested.svg?branch=master)](https://travis-ci.org/cope/sails-hook-nested)
