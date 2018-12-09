@@ -15,7 +15,9 @@ Nested attributes for sails models.
 
 #### Getting started
 
-* Add nested object with attribute rules
+Add a nested object to your model, with attribute rules. 
+
+These rules **must** conform to the [forgJs](https://github.com/oussamahamdaoui/forgJs) syntax!
 
 ```js
 module.exports = {
@@ -24,16 +26,15 @@ module.exports = {
     arrayOfObjects: {
       type: 'array',
       of: {
-        yo: {type: 'int', optional: true},
         wa: {type: 'int', optional: true},
-        res: {type: 'int', optional: true},
-        entry: {type: 'int', optional: true},
+        res: {type: 'string'},
+        entry: {type: 'int'},
         correct: 'boolean'
       }
     },
     nestedAttributes: {
       ten: {type: 'int', min: 0, max: 10, optional: true},
-      shoo: {type: 'int', optional: true},
+      shoo: {type: 'string', minLength: 6, maxLength: 22},
       maybe: 'boolean'
     }
   },
