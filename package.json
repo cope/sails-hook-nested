@@ -1,0 +1,40 @@
+{
+	"name": "sails-hook-nested",
+	"version": "0.0.1",
+	"description": "Nested attributes for sails models.",
+	"main": "index.js",
+	"scripts": {
+		"test": "mocha"
+	},
+	"author": {
+		"name": "cope"
+	},
+	"contributors": [
+		"dzoni77"
+	],
+	"keywords": [
+		"nested",
+		"attributes",
+		"sails",
+		"hook",
+		"sails-hook"
+	],
+	"license": "MIT",
+	"sails": {
+		"isHook": true,
+		"hookName": "nested"
+	},
+	"dependencies": {
+		"@cesium133/forgjs": "^1.2.1",
+		"lodash": "^4.17.11"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/cope/sails-hook-nested.git"
+	},
+	"devDependencies": {
+		"chai": "^4.2.0",
+		"mocha": "^5.2.0",
+		"sails": "^1.1.0"
+	}
+}
