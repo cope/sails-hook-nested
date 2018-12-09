@@ -3,6 +3,10 @@
 	"version": "0.0.1",
 	"description": "Nested attributes for sails models.",
 	"main": "index.js",
+	"sails": {
+		"isHook": true,
+		"hookName": "nested"
+	},
 	"scripts": {
 		"test": "mocha"
 	},
@@ -20,10 +24,6 @@
 		"sails-hook"
 	],
 	"license": "MIT",
-	"sails": {
-		"isHook": true,
-		"hookName": "nested"
-	},
 	"dependencies": {
 		"@cesium133/forgjs": "^1.2.1",
 		"lodash": "^4.17.11"
