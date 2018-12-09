@@ -21,29 +21,27 @@ Nested attributes for sails models.
 module.exports = {
 
   nested: {
-    multiplicationResults: {
+    arrayOfObjects: {
       type: 'array',
       of: {
-        lOp: {type: 'int', optional: true},
-        rOp: {type: 'int', optional: true},
+        yo: {type: 'int', optional: true},
+        wa: {type: 'int', optional: true},
         res: {type: 'int', optional: true},
-        userEntry: {type: 'int', optional: true},
-        scorrect: 'boolean'
+        entry: {type: 'int', optional: true},
+        correct: 'boolean'
       }
     },
-    divisionWithRemainder: {
-      lOp: {type: 'int', optional: true},
-      rOp: {type: 'int', optional: true},
-      res: {type: 'int', optional: true},
-      userEntry: {type: 'int', optional: true},
-      scorrect: 'boolean'
+    nestedAttributes: {
+      ten: {type: 'int', min: 0, max: 10, optional: true},
+      shoo: {type: 'int', optional: true},
+      maybe: 'boolean'
     }
   },
 
   attributes: {
-    multiplicationResults: {type: 'json', required: true},
-    divisionWithRemainder: {type: 'json'},
-    puppy: {type: 'int'}
+    arrayOfObjects: {type: 'json', required: true},
+    nestedAttributes: {type: 'json'},
+    num: {type: 'int'}
   }
 
 };
