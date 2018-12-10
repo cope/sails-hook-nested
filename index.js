@@ -22,19 +22,40 @@ const forgify = (o) => {
 	return o;
 };
 
+let carryOn = (cb, values, previous) => _.isFunction(previous) ? previous(values, cb) : cb();
+
 module.exports = (sails) => ({
-	initialize: (done) => {
+	initialize: (cb) => {
 		sails.after(['hook:moduleloader:loaded'], () => {
 			_.each(sails.models, (model) => {
 				if (!model.globalId || !model.nested) return;
 
-				let rules = forgify(nested);
+				let rules = forgify(model.nested);
+				let nestedValidation = async function (values, cb, previous) {
+					let errors = [];
+					let keys = _.keys(values);
+					_.each(keys, (key) => {
+						let v = rules[key];
+						let value = values[key];
+						if (v && value && !v.test(value)) errors.push('Failed validation for ' + key + '.');
+					});
 
-				// TODO: Override beforeCreate and beforeUpdate
-				// TODO: to parse given attributes and apply rules of the same key.
+					if (!_.isEmpty(errors)) return cb(_.join(errors, ', '));
+					return carryOn(cb, values, previous);
+				};
+
+				let previousBeforeUpdate = model.beforeUpdate;
+				model.beforeUpdate = async function (values, cb) {
+					return nestedValidation(values, cb, previousBeforeUpdate);
+				};
+
+				let previousBeforeCreate = model.beforeCreate;
+				model.beforeCreate = async function (values, cb) {
+					return nestedValidation(values, cb, previousBeforeCreate);
+				};
 			});
 
-			done();
+			cb();
 		});
 	}
 });
