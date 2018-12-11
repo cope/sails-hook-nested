@@ -28,9 +28,9 @@ const validateNested = (rules, values) => {
 	let errors = [];
 	let keys = _.keys(values);
 	_.each(keys, (key) => {
-		let v = rules[key];
+		let rule = rules[key];
 		let value = values[key];
-		if (v && value && !v.test(value)) errors.push('Failed validation for ' + key + '.');
+		if (rule && value && !rule.test(value)) errors.push('Failed validation for ' + key + '.');
 	});
 	return errors;
 };
