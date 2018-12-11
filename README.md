@@ -14,7 +14,8 @@ Nested attributes for sails models.
 ---
 
 ### TODO
-* Remove the nested object and add nested definitions directly in the attributes
+* Change from [forgJs syntax](https://github.com/oussamahamdaoui/forgJs) to regular [sails attribute types](https://sailsjs.com/documentation/concepts/models-and-orm/attributes)
+* Test deeper nested attributes
 
 ### Getting started
 
@@ -24,18 +25,17 @@ These rules **must** conform to the [forgJs](https://github.com/oussamahamdaoui/
 
 ```js
 module.exports = {
-
   attributes: {
     arrayOfObjects: {
-	  type: 'nested_array',
-	  of: {
-		wa: {type: 'int', optional: true},
-		res: {type: 'string'},
-		entry: {type: 'int'},
-		correct: 'boolean'
-	  },
-	  required: true
-	},
+      type: 'nested_array',
+      of: {
+        wa: {type: 'int', optional: true},
+        res: {type: 'string'},
+        entry: {type: 'int'},
+        correct: 'boolean'
+      },
+      required: true
+    },
     nestedAttributes: {
       type: 'nested_object',
       of: {
@@ -44,7 +44,11 @@ module.exports = {
         maybe: 'boolean'
       }
     },
-    num: {type: 'int'}
+    num: {
+        type: 'number'
+    },
+    word: {
+        type: 'string'
+    }
   }
-
 };
