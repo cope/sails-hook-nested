@@ -24,10 +24,12 @@ const forgify = (o) => {
 
 let carryOn = (values, proceed, previous) => _.isFunction(previous) ? previous(values, proceed) : proceed();
 
-module.exports = function (sails) {
+module.exports = (sails) => {
 	return {
-		initialize: function (cb) {
-			sails.on(['hook:orm:loaded'], function () {
+		defaults: {},
+
+		initialize: function (done) {
+			sails.after(['hook:sockets:loaded'], function () {
 				_.each(sails.models, (model) => {
 					if (!model.globalId || !model.nested) return;
 
@@ -47,20 +49,17 @@ module.exports = function (sails) {
 					};
 
 					let previousBeforeUpdate = model.beforeUpdate;
-					model.beforeUpdate = function (values, proceed) {
-						console.log("nested::beforeUpdate", values);
+					model.beforeUpdate = (values, proceed) => {
 						return nestedValidation(values, proceed, previousBeforeUpdate);
 					};
 
 					let previousBeforeCreate = model.beforeCreate;
-					model.beforeCreate = function (values, proceed) {
-						console.log("nested::beforeCreate", values);
+					model.beforeCreate = (values, proceed) => {
 						return nestedValidation(values, proceed, previousBeforeCreate);
 					};
-					console.log('ok');
 				});
 
-				cb();
+				done();
 			});
 		}
 	}
