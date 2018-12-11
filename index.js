@@ -22,7 +22,25 @@ const forgify = (o) => {
 	return o;
 };
 
-let carryOn = (values, proceed, previous) => _.isFunction(previous) ? previous(values, proceed) : proceed();
+const carryOn = (values, proceed, previous) => _.isFunction(previous) ? previous(values, proceed) : proceed();
+
+const validateNested = (rules, values) => {
+	let errors = [];
+	let keys = _.keys(values);
+	_.each(keys, (key) => {
+		let v = rules[key];
+		let value = values[key];
+		if (v && value && !v.test(value)) errors.push('Failed validation for ' + key + '.');
+	});
+	return errors;
+};
+
+const validate = (model, values, proceed, previous) => {
+	let rules = model.nestedValidations;
+	let errors = validateNested(rules, values);
+	if (!_.isEmpty(errors)) return proceed(_.join(errors, ', '));
+	return carryOn(values, proceed, previous);
+};
 
 module.exports = (sails) => {
 	return {
@@ -33,30 +51,22 @@ module.exports = (sails) => {
 				_.each(sails.models, (model) => {
 					if (!model.globalId || !model.nested) return;
 
-					let rules = forgify(model.nested);
+					model.nestedValidations = forgify(model.nested);
 					delete model.nested;
-					let nestedValidation = function (values, proceed, previous) {
-						let errors = [];
-						let keys = _.keys(values);
-						_.each(keys, (key) => {
-							let v = rules[key];
-							let value = values[key];
-							if (v && value && !v.test(value)) errors.push('Failed validation for ' + key + '.');
-						});
-
-						if (!_.isEmpty(errors)) return proceed(_.join(errors, ', '));
-						return carryOn(values, proceed, previous);
-					};
 
 					let previousBeforeUpdate = model.beforeUpdate;
-					model.beforeUpdate = (values, proceed) => {
-						return nestedValidation(values, proceed, previousBeforeUpdate);
-					};
+					model.beforeUpdate = (values, proceed) => validate(model, values, proceed, previousBeforeUpdate);
 
 					let previousBeforeCreate = model.beforeCreate;
-					model.beforeCreate = (values, proceed) => {
-						return nestedValidation(values, proceed, previousBeforeCreate);
-					};
+					model.beforeCreate = (values, proceed) => validate(model, values, proceed, previousBeforeCreate);
+
+					// TODO: add beforeBulkUpdate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
+					// let previousBeforeBulkUpdate = model.beforeBulkUpdate;
+					// model.beforeBulkUpdate = (instances, options) => {};
+
+					// TODO: add beforeBulkCreate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
+					// let previousBeforeBulkCreate = model.beforeBulkCreate;
+					// model.beforeBulkCreate = (options) => {};
 				});
 
 				done();
