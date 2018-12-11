@@ -25,28 +25,26 @@ These rules **must** conform to the [forgJs](https://github.com/oussamahamdaoui/
 ```js
 module.exports = {
 
-  nested: {
+  attributes: {
     arrayOfObjects: {
-      type: 'array',
+	  type: 'nested_array',
+	  of: {
+		wa: {type: 'int', optional: true},
+		res: {type: 'string'},
+		entry: {type: 'int'},
+		correct: 'boolean'
+	  },
+	  required: true
+	},
+    nestedAttributes: {
+      type: 'nested_object',
       of: {
-        wa: {type: 'int', optional: true},
-        res: {type: 'string'},
-        entry: {type: 'int'},
-        correct: 'boolean'
+        ten: {type: 'int', min: 0, max: 10, optional: true},
+        shoo: {type: 'string', minLength: 6, maxLength: 22},
+        maybe: 'boolean'
       }
     },
-    nestedAttributes: {
-      ten: {type: 'int', min: 0, max: 10, optional: true},
-      shoo: {type: 'string', minLength: 6, maxLength: 22},
-      maybe: 'boolean'
-    }
-  },
-
-  attributes: {
-    arrayOfObjects: {type: 'json', required: true},
-    nestedAttributes: {type: 'json'},
     num: {type: 'int'}
   }
 
 };
-```
