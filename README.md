@@ -13,6 +13,9 @@ Nested attributes for sails models.
 
 ---
 
+### TODO
+* Remove the nested object and add nested definitions directly in the attributes
+
 #### Getting started
 
 Add a nested object to your model, with attribute rules. 
