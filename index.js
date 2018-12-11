@@ -62,11 +62,11 @@ module.exports = (sails) => {
 
 					// TODO: add beforeBulkUpdate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
 					// let previousBeforeBulkUpdate = model.beforeBulkUpdate;
-					// model.beforeBulkUpdate = (instances, options) => {};
+					// model.beforeBulkUpdate = (options) => {};
 
 					// TODO: add beforeBulkCreate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
 					// let previousBeforeBulkCreate = model.beforeBulkCreate;
-					// model.beforeBulkCreate = (options) => {};
+					// model.beforeBulkCreate = (instances, options) => {};
 				});
 
 				done();
