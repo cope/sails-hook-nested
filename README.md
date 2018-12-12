@@ -15,40 +15,102 @@ Nested attributes for sails models.
 
 ### TODO
 * Change from [forgJs syntax](https://github.com/oussamahamdaoui/forgJs) to regular [sails attribute types](https://sailsjs.com/documentation/concepts/models-and-orm/attributes)
-* Test deeper nested attributes
+* Test deep nested attributes
 
 ### Getting started
 
-Add a nested object to your model, with attribute rules. 
+Add a nested object/array definitions to your model.
 
-These rules **must** conform to the [forgJs](https://github.com/oussamahamdaoui/forgJs) syntax!
+These attributes **must** conform to the [forgJs](https://github.com/oussamahamdaoui/forgJs) syntax, for now!
 
 ```js
 module.exports = {
-  attributes: {
-    arrayOfObjects: {
-      type: 'nested_array',
-      of: {
-        wa: {type: 'int', optional: true},
-        res: {type: 'string'},
-        entry: {type: 'int'},
-        correct: 'boolean'
-      },
-      required: true
-    },
-    nestedAttributes: {
-      type: 'nested_object',
-      of: {
-        ten: {type: 'int', min: 0, max: 10, optional: true},
-        shoo: {type: 'string', minLength: 6, maxLength: 22},
-        maybe: 'boolean'
-      }
-    },
-    num: {
-        type: 'number'
-    },
-    word: {
-        type: 'string'
-    }
-  }
+	attributes: {
+
+		// nested attributes definitions
+		arrayOfObjects: {
+			type: 'nested_array',
+			of: {
+				wa: {type: 'int', optional: true},
+				res: {type: 'string'},
+				entry: {type: 'int'},
+				correct: 'boolean',
+				deep: {
+					type: 'nested_object',
+					of: {
+						ten: {type: 'int', min: 0, max: 10, optional: true},
+						shoo: {type: 'string', minLength: 6, maxLength: 22},
+						maybe: 'boolean',
+						deepArray: {
+							type: 'nested_array',
+							of: {
+								wa: {type: 'int', optional: true},
+								res: {type: 'string'},
+								entry: {type: 'int'},
+								correct: 'boolean',
+								deeper: {
+									type: 'nested_object',
+									of: {
+										ten: {type: 'int', min: 0, max: 10, optional: true},
+										shoo: {type: 'string', minLength: 6, maxLength: 22},
+										maybe: 'boolean',
+										evenDeeper: {
+											type: 'nested_object',
+											of: {
+												ten: {type: 'int', min: 0, max: 10, optional: true},
+												shoo: {type: 'string', minLength: 6, maxLength: 22},
+												maybe: 'boolean'
+											}
+										}
+									}
+								}
+							},
+							required: true
+						}
+					}
+				}
+			},
+			required: true
+		},
+		nestedAttributes: {
+			type: 'nested_object',
+			of: {
+				ten: {type: 'int', min: 0, max: 10, optional: true},
+				shoo: {type: 'string', minLength: 6, maxLength: 22},
+				maybe: 'boolean',
+				deep: {
+					type: 'nested_object',
+					of: {
+						ten: {type: 'int', min: 0, max: 10, optional: true},
+						shoo: {type: 'string', minLength: 6, maxLength: 22},
+						maybe: 'boolean',
+						deeper: {
+							type: 'nested_object',
+							of: {
+								ten: {type: 'int', min: 0, max: 10, optional: true},
+								shoo: {type: 'string', minLength: 6, maxLength: 22},
+								maybe: 'boolean',
+								evenDeeper: {
+									type: 'nested_object',
+									of: {
+										ten: {type: 'int', min: 0, max: 10, optional: true},
+										shoo: {type: 'string', minLength: 6, maxLength: 22},
+										maybe: 'boolean'
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		// regular sails attributes
+		num: {
+			type: 'number'
+		},
+		word: {
+			type: 'string'
+		}
+	}
 };
