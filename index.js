@@ -8,93 +8,100 @@ const hasNestedDefinitions = (m) => !!(_.find(m.attributes, ['type', 'nested_arr
 
 const hasPlainObject = (o) => !!_.findKey(o, _.isPlainObject);
 const forgify = (o) => {
-  let keys = _.keys(o);
-  for (let k of keys) {
-    let v = o[k];
-    if (_.isPlainObject(v)) {
-      if (hasPlainObject(v)) {
-        if ('array' === v.type) o[k] = new Rule(forgify(v));
-        else o[k] = new Validator(forgify(v));
-      } else {
-        if (v.type) o[k] = new Rule(v);
-        else o[k] = new Validator(v);
-      }
-    } else {
-      if ('boolean' === v) o[k] = new Rule(v);
-    }
-  }
-  o = _.pick(o, keys);
-  return o;
+	let keys = _.keys(o);
+	for (let k of keys) {
+		let v = _.get(o, k);
+		// if (_.isPlainObject(v)) {
+		// 	if (hasPlainObject(v)) {
+		// 		if ('array' === v.type) o[k] = new Rule(forgify(v));
+		// 		else o[k] = new Validator(forgify(v));
+		// 	} else {
+		// 		if (v.type) o[k] = new Rule(v);
+		// 		else o[k] = new Validator(v);
+		// 	}
+		// } else if ('boolean' === v) o[k] = new Rule(v);
+		if (_.isPlainObject(v)) {
+			if (hasPlainObject(v)) {
+				if ('array' === v.type) _.set(o, k, new Rule(forgify(v)));
+				else _.set(o, k, new Validator(forgify(v)));
+			} else {
+				if (v.type) _.set(o, k, new Rule(v));
+				else _.set(o, k, new Validator(v));
+			}
+		} else if ('boolean' === v) _.set(o, k, new Rule(v));
+	}
+	o = _.pick(o, keys);
+	return o;
 };
 
 const convert = (model) => {
-  model.nestedValidations = {};
-  let names = _.keys(model.attributes);
-  for (let n of names) {
-    let a = model.attributes[n];
+	model.nestedValidations = {};
+	let names = _.keys(model.attributes);
+	for (let n of names) {
+		let a = model.attributes[n];
 
-    if (isNestedDefinition(a)) {
-      if (isNestedArray(n)) {
-        a.type = 'array';
-        model.nestedValidations[n] = forgify(a);
-      } else if (isNestedObject(n)) {
-        model.nestedValidations[n] = forgify(a.of);
-      }
-      a.type = 'json';
-      model.attributes[n] = _.omit(a, ['of']);
-    }
-  }
-  return model;
+		if (isNestedDefinition(a)) {
+			if (isNestedArray(n)) {
+				a.type = 'array';
+				model.nestedValidations[n] = forgify(a);
+			} else if (isNestedObject(n)) {
+				model.nestedValidations[n] = forgify(a.of);
+			}
+			a.type = 'json';
+			model.attributes[n] = _.omit(a, ['of']);
+		}
+	}
+	return model;
 };
 
 const carryOn = (values, proceed, previous) => _.isFunction(previous) ? previous(values, proceed) : proceed();
 
 const validateNested = (rules, values) => {
-  let errors = [];
-  let keys = _.keys(values);
-  _.each(keys, (key) => {
-    let rule = rules[key];
-    let value = values[key];
-    if (rule && value && !rule.test(value)) errors.push('Failed validation for ' + key + '.');
-  });
-  return errors;
+	let errors = [];
+	let keys = _.keys(values);
+	_.each(keys, (key) => {
+		let rule = rules[key];
+		let value = values[key];
+		if (rule && value && !rule.test(value)) errors.push('Failed validation for ' + key + '.');
+	});
+	return errors;
 };
 
 const validate = (model, values, proceed, previous) => {
-  let rules = model.nestedValidations;
-  let errors = validateNested(rules, values);
-  if (!_.isEmpty(errors)) return proceed(_.join(errors, ', '));
-  return carryOn(values, proceed, previous);
+	let rules = model.nestedValidations;
+	let errors = validateNested(rules, values);
+	if (!_.isEmpty(errors)) return proceed(_.join(errors, ', '));
+	return carryOn(values, proceed, previous);
 };
 
 module.exports = (sails) => {
-  return {
-    defaults: {},
+	return {
+		defaults: {},
 
-    initialize: function (done) {
-      sails.after(['hook:sockets:loaded'], function () {
-        _.each(sails.models, (model) => {
-          if (!model.globalId || !hasNestedDefinitions(model)) return;
+		initialize: function (done) {
+			sails.after(['hook:sockets:loaded'], function () {
+				_.each(sails.models, (model) => {
+					if (!model.globalId || !hasNestedDefinitions(model)) return;
 
-          model = convert(model);
+					model = convert(model);
 
-          let previousBeforeUpdate = model.beforeUpdate;
-          model.beforeUpdate = (values, proceed) => validate(model, values, proceed, previousBeforeUpdate);
+					let previousBeforeUpdate = model.beforeUpdate;
+					model.beforeUpdate = (values, proceed) => validate(model, values, proceed, previousBeforeUpdate);
 
-          let previousBeforeCreate = model.beforeCreate;
-          model.beforeCreate = (values, proceed) => validate(model, values, proceed, previousBeforeCreate);
+					let previousBeforeCreate = model.beforeCreate;
+					model.beforeCreate = (values, proceed) => validate(model, values, proceed, previousBeforeCreate);
 
-          // TODO: add beforeBulkUpdate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
-          // let previousBeforeBulkUpdate = model.beforeBulkUpdate;
-          // model.beforeBulkUpdate = (options) => {};
+					// TODO: add beforeBulkUpdate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
+					// let previousBeforeBulkUpdate = model.beforeBulkUpdate;
+					// model.beforeBulkUpdate = (options) => {};
 
-          // TODO: add beforeBulkCreate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
-          // let previousBeforeBulkCreate = model.beforeBulkCreate;
-          // model.beforeBulkCreate = (instances, options) => {};
-        });
+					// TODO: add beforeBulkCreate override, see http://docs.sequelizejs.com/manual/tutorial/hooks.html#model-hooks
+					// let previousBeforeBulkCreate = model.beforeBulkCreate;
+					// model.beforeBulkCreate = (instances, options) => {};
+				});
 
-        done();
-      });
-    }
-  }
+				done();
+			});
+		}
+	}
 };
