@@ -90,7 +90,7 @@ module.exports = (sails) => {
 	return {
 		defaults: {},
 
-		initialize: function (done) {
+		initialize(done) {
 			sails.after(['hook:sockets:loaded'], function () {
 				_.each(sails.models, (model) => {
 					if (!model.globalId || !hasNestedDefinitions(model)) {
@@ -117,5 +117,5 @@ module.exports = (sails) => {
 				done();
 			});
 		}
-	}
+	};
 };
