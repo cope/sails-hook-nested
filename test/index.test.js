@@ -22,7 +22,9 @@ describe('sails.hook.nested', () => {
 				level: 'error'
 			}
 		}, (err, _sails) => {
-			if (err) return done(err);
+			if (err) {
+				return done(err);
+			}
 			sails = _sails;
 			return done();
 		});
@@ -31,7 +33,9 @@ describe('sails.hook.nested', () => {
 	// After tests are complete, lower Sails
 	after(function (done) {
 		// Lower Sails (if it successfully lifted)
-		if (sails) return sails.lower(done);
+		if (sails) {
+			return sails.lower(done);
+		}
 
 		// Otherwise just return
 		return done();
