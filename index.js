@@ -10,25 +10,30 @@ const hasPlainObject = (o) => !!_.findKey(o, _.isPlainObject);
 const forgify = (o) => {
 	let keys = _.keys(o);
 	for (let k of keys) {
-		let v = _.get(o, k);
-		// if (_.isPlainObject(v)) {
-		// 	if (hasPlainObject(v)) {
-		// 		if ('array' === v.type) o[k] = new Rule(forgify(v));
-		// 		else o[k] = new Validator(forgify(v));
-		// 	} else {
-		// 		if (v.type) o[k] = new Rule(v);
-		// 		else o[k] = new Validator(v);
-		// 	}
-		// } else if ('boolean' === v) o[k] = new Rule(v);
+		let insert, v = _.get(o, k);
 		if (_.isPlainObject(v)) {
 			if (hasPlainObject(v)) {
-				if ('array' === v.type) _.set(o, k, new Rule(forgify(v)));
-				else _.set(o, k, new Validator(forgify(v)));
+				if ('array' === v.type) {
+					insert = new Rule(forgify(v));
+				} else {
+					insert = new Validator(forgify(v));
+				}
 			} else {
-				if (v.type) _.set(o, k, new Rule(v));
-				else _.set(o, k, new Validator(v));
+				if (v.type) {
+					insert = new Rule(v);
+				} else {
+					insert = new Validator(v);
+				}
 			}
-		} else if ('boolean' === v) _.set(o, k, new Rule(v));
+		} else {
+			if ('boolean' === v) {
+				insert = new Rule(v);
+			}
+		}
+
+		if (insert) {
+			_.set(o, k, insert);
+		}
 	}
 	o = _.pick(o, keys);
 	return o;
@@ -44,9 +49,12 @@ const convert = (model) => {
 			if (isNestedArray(n)) {
 				a.type = 'array';
 				model.nestedValidations[n] = forgify(a);
-			} else if (isNestedObject(n)) {
-				model.nestedValidations[n] = forgify(a.of);
+			} else {
+				if (isNestedObject(n)) {
+					model.nestedValidations[n] = forgify(a.of);
+				}
 			}
+
 			a.type = 'json';
 			model.attributes[n] = _.omit(a, ['of']);
 		}
@@ -62,7 +70,9 @@ const validateNested = (rules, values) => {
 	_.each(keys, (key) => {
 		let rule = rules[key];
 		let value = values[key];
-		if (rule && value && !rule.test(value)) errors.push('Failed validation for ' + key + '.');
+		if (rule && value && !rule.test(value)) {
+			errors.push('Failed validation for ' + key + '.');
+		}
 	});
 	return errors;
 };
@@ -70,7 +80,9 @@ const validateNested = (rules, values) => {
 const validate = (model, values, proceed, previous) => {
 	let rules = model.nestedValidations;
 	let errors = validateNested(rules, values);
-	if (!_.isEmpty(errors)) return proceed(_.join(errors, ', '));
+	if (!_.isEmpty(errors)) {
+		return proceed(_.join(errors, ', '));
+	}
 	return carryOn(values, proceed, previous);
 };
 
@@ -81,7 +93,9 @@ module.exports = (sails) => {
 		initialize: function (done) {
 			sails.after(['hook:sockets:loaded'], function () {
 				_.each(sails.models, (model) => {
-					if (!model.globalId || !hasNestedDefinitions(model)) return;
+					if (!model.globalId || !hasNestedDefinitions(model)) {
+						return;
+					}
 
 					model = convert(model);
 
