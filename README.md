@@ -14,11 +14,8 @@ Nested attributes for sails models.
 ---
 
 ### TODO
-
 * Test deep nested attributes
-
 * Change from [forgJs syntax](https://github.com/oussamahamdaoui/forgJs) to regular [sails attribute types](https://sailsjs.com/documentation/concepts/models-and-orm/attributes)
-
 
 ### Getting started
 
